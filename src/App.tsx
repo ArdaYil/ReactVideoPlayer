@@ -17,6 +17,7 @@ const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
 
   const playVideo = () => {
     videoRef.current?.play();
@@ -65,6 +66,8 @@ const App = () => {
   };
 
   useEffect(() => {
+    let lastMouseMovementTime = Date.now();
+
     const video = videoRef.current;
     const timer = timerRef.current;
     console.log(video, timer);
@@ -83,6 +86,42 @@ const App = () => {
           video.duration
         )}`)
     );
+
+    videoContainerRef.current?.addEventListener(
+      "mousemove",
+      (e: MouseEvent) => {
+        const footer = footerRef.current;
+
+        if (!footer) return;
+
+        footer.style.opacity = "1";
+
+        lastMouseMovementTime = Date.now();
+      }
+    );
+
+    videoContainerRef.current?.addEventListener("mouseleave", () => {
+      const footer = footerRef.current;
+
+      if (!footer) return;
+
+      footer.style.opacity = "0";
+    });
+
+    window.setInterval(() => {
+      if (Date.now() - lastMouseMovementTime > 3_000) {
+        const footer = footerRef.current;
+
+        if (!footer) return;
+
+        footer.style.opacity = "0";
+      }
+    }, 1_000);
+
+    return () => {
+      video.removeEventListener("loadeddata", () => {});
+      video.removeEventListener("timeupdate", () => {});
+    };
   }, []);
 
   return (
@@ -105,7 +144,7 @@ const App = () => {
         </div>
         <p className="video-container__header__title"></p>
       </header>
-      <footer className="video-container__footer">
+      <footer ref={footerRef} className="video-container__footer">
         <div className="video-container__footer__timeline-container"></div>
         <div className="video-container__footer__video-controls">
           <div className="video-container__footer__video-controls__left">

@@ -12,6 +12,8 @@
         bottom: u.em(10);
         left: 0;
         right: 0;
+        opacity: 0;
+        transition: opacity 150ms ease-in-out;
 
         &__video-controls {
             padding-inline: u.em(10);
