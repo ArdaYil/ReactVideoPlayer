@@ -43,6 +43,14 @@
         object-fit: cover;
         z-index: -100;
     }
+
+    &.paused .pause {
+        display: none;
+    }
+
+    &:not(.paused) .play {
+        display: none;
+    }
 }
 
 svg {
