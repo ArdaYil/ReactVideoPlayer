@@ -1,0 +1,22 @@
+@use "../util" as u;
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('./src/assets/fonts/Open_Sans/static/OpenSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+body {
+    font-family: "Open Sans";
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+
+h1, h2, h3, h4, h5, h6, p, a {
+    font-size: u.rem(16);
+    font-weight: 400;
+    overflow-wrap: break-word;
+}
