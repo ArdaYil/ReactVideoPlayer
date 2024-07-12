@@ -11,6 +11,7 @@ node_modules
 dist
 cssDist/
 dist-ssr
+*.mp4
 *.local
 
 # Editor directories and files

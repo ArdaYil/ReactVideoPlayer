@@ -26,22 +26,26 @@ const App = () => {
       <footer className="video-container__footer">
         <div className="video-container__footer__timeline-container"></div>
         <div className="video-container__footer__video-controls">
-          <FaPlay />
-          <FaPause />
-          <MdVolumeMute />
-          <MdVolumeDown />
-          <MdVolumeUp />
-          <TbRewindBackward10 />
-          <TbRewindForward10 />
-          <p className="video-container__footer__video-controls__video-time">
-            0:00/0:00
-          </p>
-          <IoSettingsSharp />
-          <MdFullscreen />
-          <MdFullscreenExit />
+          <div className="video-container__footer__video-controls__left">
+            <FaPlay color="white" />
+            {/* <FaPause /> */}
+            {/* <MdVolumeMute />
+          <MdVolumeDown /> */}
+            <MdVolumeUp />
+            <TbRewindBackward10 />
+            <TbRewindForward10 className="rewind-forward" />
+          </div>
+          <div className="video-container__footer__video-controls__right">
+            <p className="video-container__footer__video-controls__video-time">
+              0:00/0:00
+            </p>
+            <IoSettingsSharp />
+            <MdFullscreen />
+            {/* <MdFullscreenExit /> */}
+          </div>
         </div>
       </footer>
-      <video className="video-container__video" />
+      <video className="video-container__video" src="src/assets/Video.mp4" />
     </div>
   );
 };
