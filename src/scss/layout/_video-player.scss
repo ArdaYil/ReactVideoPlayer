@@ -51,6 +51,14 @@
     &:not(.paused) .play {
         display: none;
     }
+
+    &.full-screen .enter-full-screen {
+        display: none;
+    }
+
+    &:not(.full-screen) .exit-full-screen {
+        display: none;
+    }
 }
 
 svg {

@@ -16,6 +16,7 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   const playVideo = () => {
     videoRef.current?.play();
@@ -33,6 +34,20 @@ const App = () => {
     if (!video) return;
 
     video.paused ? playVideo() : pauseVideo();
+  };
+
+  const toggleFullScreen = () => {
+    const video = videoRef.current;
+
+    if (!video) return;
+    console.log(document.fullscreenElement);
+    if (document.fullscreenElement == null) {
+      videoContainerRef.current?.requestFullscreen();
+      videoContainerRef.current?.classList.add("full-screen");
+    } else {
+      document.exitFullscreen();
+      videoContainerRef.current?.classList.remove("full-screen");
+    }
   };
 
   const doubleDigit = (digit: number) => (digit < 10 ? `0${digit}` : digit);
@@ -71,7 +86,10 @@ const App = () => {
   }, []);
 
   return (
-    <div className={`video-container ${!isPlaying ? "paused" : ""}`}>
+    <div
+      ref={videoContainerRef}
+      className={`video-container ${!isPlaying ? "paused" : ""}`}
+    >
       <video
         ref={videoRef}
         className="video-container__video"
@@ -107,8 +125,14 @@ const App = () => {
               0:00/{timeFormat(videoRef.current?.duration as number)}
             </p>
             <IoSettingsSharp />
-            <MdFullscreen />
-            {/* <MdFullscreenExit /> */}
+            <MdFullscreen
+              className="enter-full-screen"
+              onClick={toggleFullScreen}
+            />
+            <MdFullscreenExit
+              className="exit-full-screen"
+              onClick={toggleFullScreen}
+            />
           </div>
         </div>
       </footer>
