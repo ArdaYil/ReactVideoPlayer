@@ -1,0 +1,27 @@
+
+
+@use "sass:math";
+
+@function toRelativeUnit($px) {
+    @if (math.is-unitless($px)) {
+        @return math.div($px, 16);
+    }
+
+    @error("First positional argument must be unitless");
+}
+
+@function em($px) {
+    @return toRelativeUnit($px) + em;
+}
+
+@function rem($px) {
+    @return toRelativeUnit($px) + rem;
+}
+
+@function errorIfUnit($value) {
+    @if (not math.is-unitless($value)) {
+        @error("Input must be unitless");
+    }
+
+    @return $value;
+}
