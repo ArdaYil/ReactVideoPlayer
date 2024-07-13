@@ -77,6 +77,14 @@ const App = () => {
     video.volume = newVolume;
   };
 
+  const renderVolumeIcon = () => {
+    if (volume > 0.5) return <MdVolumeUp className="volume-high" />;
+
+    if (volume > 0) return <MdVolumeDown className="volume-low" />;
+
+    return <MdVolumeMute className="volume-mute" />;
+  };
+
   useEffect(() => {
     let lastMouseMovementTime = Date.now();
 
@@ -162,9 +170,7 @@ const App = () => {
           <div className="video-container__footer__video-controls__left">
             <FaPlay className="play" color="white" onClick={togglePlayback} />
             <FaPause className="pause" onClick={togglePlayback} />
-            {/* <MdVolumeMute />
-          <MdVolumeDown /> */}
-            <MdVolumeUp />
+            {renderVolumeIcon()}
             <Slider
               min={0}
               max={1}

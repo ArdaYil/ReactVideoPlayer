@@ -16,7 +16,6 @@ const Slider = ({ min, max, volume, onChange }: Props) => {
     if (!slider) return;
 
     const percentage = parseFloat(slider.value) / max;
-    const rest = 1 - percentage;
 
     slider.style.background = `linear-gradient(90deg, rgb(255, 0, 0) ${
       percentage * 100
