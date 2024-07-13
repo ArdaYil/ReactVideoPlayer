@@ -1,0 +1,20 @@
+@use "../util" as u;
+
+.slider-container {
+    display: flex;
+    align-items: center;
+
+    &__slider {
+        -webkit-appearance: none;
+        height: u.em(4);
+
+        &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: u.em(15);
+            height: u.em(15);
+            background-color: #fff;
+            border-radius: 50%;
+        }
+    }
+}

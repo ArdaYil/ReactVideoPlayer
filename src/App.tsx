@@ -117,11 +117,11 @@ const App = () => {
 
       if (!footer) return;
 
-      footer.style.opacity = "0";
+      //footer.style.opacity = "0";
     });
 
     window.setInterval(() => {
-      if (Date.now() - lastMouseMovementTime > 3_000) {
+      if (Date.now() - lastMouseMovementTime > 3000_000) {
         const footer = footerRef.current;
 
         if (!footer) return;
