@@ -11,9 +11,11 @@ import {
 import { IoSettingsSharp } from "react-icons/io5";
 import { TbRewindForward10, TbRewindBackward10 } from "react-icons/tb";
 import { useEffect, useRef, useState } from "react";
+import Slider from "./components/Slider";
 
 const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.5);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -41,7 +43,7 @@ const App = () => {
     const video = videoRef.current;
 
     if (!video) return;
-    console.log(document.fullscreenElement);
+
     if (document.fullscreenElement == null) {
       videoContainerRef.current?.requestFullscreen();
       videoContainerRef.current?.classList.add("full-screen");
@@ -65,12 +67,22 @@ const App = () => {
       : `${doubleDigit(minutes)}:${doubleDigit(seconds)}`;
   };
 
+  const handleVolumeChange = (newVolume: number) => {
+    setVolume(newVolume);
+
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    video.volume = newVolume;
+  };
+
   useEffect(() => {
     let lastMouseMovementTime = Date.now();
 
     const video = videoRef.current;
     const timer = timerRef.current;
-    console.log(video, timer);
+
     if (!(video && timer)) return;
 
     video?.addEventListener("loadeddata", () => {
@@ -153,6 +165,12 @@ const App = () => {
             {/* <MdVolumeMute />
           <MdVolumeDown /> */}
             <MdVolumeUp />
+            <Slider
+              min={0}
+              max={1}
+              volume={volume}
+              onChange={handleVolumeChange}
+            />
             <TbRewindBackward10 />
             <TbRewindForward10 className="rewind-forward" />
           </div>
