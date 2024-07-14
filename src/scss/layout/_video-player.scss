@@ -33,6 +33,32 @@
                 gap: u.em(10);
             }
         }
+
+        &__timeline-container {
+            margin-bottom: u.em(15);
+            padding: u.em(10);
+            width: 100%;
+
+            &__timeline {
+                height: u.em(2);
+                background-color: white;
+                position: relative;
+
+                &::after {
+                    $size: 10;
+
+                    content: "";
+                    width: u.em($size);
+                    height: u.em($size);
+                    background-color: red;
+                    display: block;
+                    position: absolute;
+                    border-radius: 50%;
+                    top: u.em(-4);
+                    cursor: pointer;
+                }
+            }
+        }
     }
 
     &__video {

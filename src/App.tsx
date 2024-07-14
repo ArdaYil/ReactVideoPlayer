@@ -190,7 +190,9 @@ const App = () => {
         <p className="video-container__header__title"></p>
       </header>
       <footer ref={footerRef} className="video-container__footer">
-        <div className="video-container__footer__timeline-container"></div>
+        <div className="video-container__footer__timeline-container">
+          <div className="video-container__footer__timeline-container__timeline"></div>
+        </div>
         <div className="video-container__footer__video-controls">
           <div className="video-container__footer__video-controls__left">
             <FaPlay className="play" color="white" onClick={togglePlayback} />
