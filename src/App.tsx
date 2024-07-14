@@ -192,8 +192,12 @@ const App = () => {
     const timelineContainer = timelineContainerRef.current;
     const timeline = timelineRef.current;
     const previewImg = previewImgRef.current;
+    const videoContainer = videoContainerRef.current;
 
-    if (!(video && timelineContainer && timeline && previewImg)) return;
+    if (
+      !(video && timelineContainer && timeline && previewImg && videoContainer)
+    )
+      return;
 
     if (isMuted) {
       video.volume = 0;
@@ -210,6 +214,10 @@ const App = () => {
         "--progress-position",
         percent.toString()
       );
+    });
+
+    videoContainer.addEventListener("mousedown", () => {
+      togglePlayback();
     });
 
     timelineContainer.addEventListener("mousemove", handleTimelineUpdate);
