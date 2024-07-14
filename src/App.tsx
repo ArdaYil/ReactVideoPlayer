@@ -21,6 +21,10 @@ const App = () => {
   const timerRef = useRef<HTMLParagraphElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const timelineContainerRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const timelineThumbRef = useRef<HTMLDivElement>(null);
+  const previewImgRef = useRef<HTMLImageElement>(null);
 
   const playVideo = () => {
     videoRef.current?.play();
@@ -92,6 +96,17 @@ const App = () => {
     return <MdVolumeMute onClick={toggleMute} className="volume-mute" />;
   };
 
+  const setTime = () => {
+    const timer = timerRef.current;
+    const video = videoRef.current;
+
+    if (!(timer && video)) return;
+
+    timer.textContent = `${timeFormat(video.currentTime)}/${timeFormat(
+      video.duration
+    )}`;
+  };
+
   const toggleMute = () => {
     const video = videoRef.current;
 
@@ -106,31 +121,112 @@ const App = () => {
     }
   };
 
+  const handleTimelineUpdate = (e: MouseEvent) => {
+    const video = videoRef.current;
+    const timelineContainer = timelineContainerRef.current;
+    const timeline = timelineRef.current;
+    const previewImg = previewImgRef.current;
+
+    if (!(video && timelineContainer && timeline && previewImg)) return;
+
+    const rect = timeline.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
+
+    const previewImgNumber = Math.max(
+      1,
+      Math.floor((percent * video.duration) / 10)
+    );
+
+    const previewImgSrc = `src/assets/previews/preview${previewImgNumber}.jpg`;
+
+    previewImg.src = previewImgSrc;
+    timelineContainer.style.setProperty(
+      "--preview-position",
+      percent.toString()
+    );
+
+    previewImg.style.display = "block";
+
+    if (isScrubbing) {
+      e.preventDefault();
+      timelineContainer.style.setProperty(
+        "--progress-position",
+        percent.toString()
+      );
+    }
+  };
+
+  let isScrubbing = false;
+  let wasPaused = false;
+  const toggleScrubbing = (e: MouseEvent) => {
+    const timelineContainer = timelineContainerRef.current;
+    const videoContainer = videoContainerRef.current;
+    const video = videoRef.current;
+
+    if (!(timelineContainer && videoContainer && video)) return;
+
+    const rect = timelineContainer.getBoundingClientRect();
+    const percent =
+      Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
+
+    isScrubbing = (e.buttons & 1) === 1;
+
+    videoContainer.classList.toggle("scrubbing", isScrubbing);
+
+    if (isScrubbing) {
+      wasPaused = video.paused;
+      pauseVideo();
+    } else {
+      video.currentTime = percent * video.duration;
+      if (!wasPaused) playVideo();
+    }
+
+    handleTimelineUpdate(e);
+  };
+
   useEffect(() => {
     let lastMouseMovementTime = Date.now();
 
     const video = videoRef.current;
-    const timer = timerRef.current;
+    const timelineContainer = timelineContainerRef.current;
+    const timeline = timelineRef.current;
+    const previewImg = previewImgRef.current;
 
-    if (!(video && timer)) return;
+    if (!(video && timelineContainer && timeline && previewImg)) return;
 
     if (isMuted) {
       video.volume = 0;
     }
 
-    video?.addEventListener("loadeddata", () => {
-      timer.textContent = `${timeFormat(video.currentTime)}/${timeFormat(
-        video.duration
-      )}`;
+    video?.addEventListener("loadeddata", setTime);
+
+    video.addEventListener("timeupdate", () => {
+      setTime();
+
+      const percent = video.currentTime / video.duration;
+
+      timelineContainer.style.setProperty(
+        "--progress-position",
+        percent.toString()
+      );
     });
 
-    video.addEventListener(
-      "timeupdate",
-      () =>
-        (timer.textContent = `${timeFormat(video.currentTime)}/${timeFormat(
-          video.duration
-        )}`)
-    );
+    timelineContainer.addEventListener("mousemove", handleTimelineUpdate);
+
+    timelineContainer.addEventListener("mouseleave", () => {
+      timelineContainer.style.setProperty("--preview-position", "0");
+      previewImg.style.display = "none";
+    });
+
+    timelineContainer.addEventListener("mousedown", toggleScrubbing);
+    document.addEventListener("mouseup", (e) => {
+      if (isScrubbing) toggleScrubbing(e);
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (isScrubbing) handleTimelineUpdate(e);
+    });
 
     videoContainerRef.current?.addEventListener(
       "mousemove",
@@ -150,16 +246,17 @@ const App = () => {
 
       if (!footer) return;
 
-      //footer.style.opacity = "0";
+      footer.style.opacity = "0";
     });
 
     window.setInterval(() => {
-      if (Date.now() - lastMouseMovementTime > 3000_000) {
+      if (Date.now() - lastMouseMovementTime > 3_000) {
         const footer = footerRef.current;
 
         if (!footer) return;
 
         footer.style.opacity = "0";
+        timelineContainer.style.setProperty("--preview-position", "0");
       }
     }, 1_000);
 
@@ -190,8 +287,23 @@ const App = () => {
         <p className="video-container__header__title"></p>
       </header>
       <footer ref={footerRef} className="video-container__footer">
-        <div className="video-container__footer__timeline-container">
-          <div className="video-container__footer__timeline-container__timeline"></div>
+        <div
+          ref={timelineContainerRef}
+          className="video-container__footer__timeline-container"
+        >
+          <img
+            ref={previewImgRef}
+            className="video-container__footer__timeline-container__preview-img"
+          />
+          <div
+            ref={timelineRef}
+            className="video-container__footer__timeline-container__timeline timeline"
+          >
+            <div
+              ref={timelineThumbRef}
+              className="video-container__footer__timeline-container__timeline__thumb thumb"
+            ></div>
+          </div>
         </div>
         <div className="video-container__footer__video-controls">
           <div className="video-container__footer__video-controls__left">

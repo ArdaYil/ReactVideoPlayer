@@ -9,11 +9,14 @@
 
     &__footer {
         position: absolute;
-        bottom: u.em(10);
+        bottom: u.em(0);
+        padding-bottom: u.em(10);
+        padding-inline: u.em(10);
         left: 0;
         right: 0;
         opacity: 0;
         transition: opacity 150ms ease-in-out;
+        background-color: rgba(61, 61, 61, 0.2);
 
         &__video-controls {
             padding-inline: u.em(10);
@@ -36,26 +39,72 @@
 
         &__timeline-container {
             margin-bottom: u.em(15);
-            padding: u.em(10);
+            padding-block: u.em(20);
             width: 100%;
+            cursor: pointer;
+
+            &:hover .thumb {
+                --scale: 1.5;
+                cursor: pointer;
+            }
+
+            &:hover .timeline {
+                height: u.em(4);
+                transition: all 150ms ease-in-out;
+                opacity: 1;
+            }
+
+            &__preview-img {
+                position: absolute;
+                height: u.em(80);
+                aspect-ratio: 16 / 9;
+                top: u.em(-16);
+                transform: translate(-50%, -100%);
+                left: calc(var(--preview-position) * 100%);
+                border-radius: u.em(0.25);
+                border: u.em(2) solid gray;
+                display: none;
+            }
 
             &__timeline {
                 height: u.em(2);
                 background-color: white;
                 position: relative;
+                opacity: 0.7;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    right: calc(100% - var(--preview-position) * 100%);
+                    background-color: rgb(150, 150, 150);
+                }
 
                 &::after {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    right: calc(100% - var(--progress-position) * 100%);
+                    background-color: red;
+                }
+
+                &__thumb {
                     $size: 10;
 
-                    content: "";
-                    width: u.em($size);
-                    height: u.em($size);
-                    background-color: red;
-                    display: block;
+                    --scale: 0;
                     position: absolute;
+                    height: 200%;
+                    transform: translateX(-50%) scale(var(--scale));
+                    top: -50%;
+                    left: calc(var(--progress-position) * 100%);
+                    background-color: red;
                     border-radius: 50%;
-                    top: u.em(-4);
-                    cursor: pointer;
+                    transition: transform 150ms ease-in-out;
+                    aspect-ratio: 1 / 1;
                 }
             }
         }
