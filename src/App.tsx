@@ -16,6 +16,7 @@ import Slider from "./components/Slider";
 const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -68,6 +69,7 @@ const App = () => {
   };
 
   const handleVolumeChange = (newVolume: number) => {
+    setIsMuted(false);
     setVolume(newVolume);
 
     const video = videoRef.current;
@@ -78,11 +80,30 @@ const App = () => {
   };
 
   const renderVolumeIcon = () => {
-    if (volume > 0.5) return <MdVolumeUp className="volume-high" />;
+    if (isMuted)
+      return <MdVolumeMute onClick={toggleMute} className="volume-mute" />;
 
-    if (volume > 0) return <MdVolumeDown className="volume-low" />;
+    if (volume > 0.5)
+      return <MdVolumeUp onClick={toggleMute} className="volume-high" />;
 
-    return <MdVolumeMute className="volume-mute" />;
+    if (volume > 0)
+      return <MdVolumeDown onClick={toggleMute} className="volume-low" />;
+
+    return <MdVolumeMute onClick={toggleMute} className="volume-mute" />;
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    if (isMuted) {
+      setIsMuted(false);
+      video.volume = volume;
+    } else {
+      setIsMuted(true);
+      video.volume = 0;
+    }
   };
 
   useEffect(() => {
@@ -92,6 +113,10 @@ const App = () => {
     const timer = timerRef.current;
 
     if (!(video && timer)) return;
+
+    if (isMuted) {
+      video.volume = 0;
+    }
 
     video?.addEventListener("loadeddata", () => {
       timer.textContent = `${timeFormat(video.currentTime)}/${timeFormat(
