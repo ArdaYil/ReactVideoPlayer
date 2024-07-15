@@ -185,6 +185,29 @@ const App = () => {
     handleTimelineUpdate(e);
   };
 
+  const handleKeyEvent = (e: KeyboardEvent) => {
+    const tagName = document.activeElement?.tagName.toLowerCase();
+
+    if (tagName === "imput") return;
+
+    switch (e.key.toLowerCase()) {
+      case " ":
+        if (tagName === "button") return;
+      case "k":
+        console.log("k");
+        togglePlayback();
+        break;
+
+      case "f":
+        toggleFullScreen();
+        break;
+
+      case "m":
+        toggleMute();
+        break;
+    }
+  };
+
   useEffect(() => {
     let lastMouseMovementTime = Date.now();
 
@@ -216,9 +239,9 @@ const App = () => {
       );
     });
 
-    videoContainer.addEventListener("mousedown", () => {
-      togglePlayback();
-    });
+    videoContainer.addEventListener("mousedown", togglePlayback);
+
+    window.addEventListener("keydown", handleKeyEvent);
 
     timelineContainer.addEventListener("mousemove", handleTimelineUpdate);
 
@@ -228,6 +251,7 @@ const App = () => {
     });
 
     timelineContainer.addEventListener("mousedown", toggleScrubbing);
+
     document.addEventListener("mouseup", (e) => {
       if (isScrubbing) toggleScrubbing(e);
     });
@@ -271,8 +295,10 @@ const App = () => {
     return () => {
       video.removeEventListener("loadeddata", () => {});
       video.removeEventListener("timeupdate", () => {});
+      videoContainer.removeEventListener("mousedown", () => {});
+      window.removeEventListener("keydown", handleKeyEvent);
     };
-  }, []);
+  }, [isMuted, isPlaying, volume]);
 
   return (
     <div
