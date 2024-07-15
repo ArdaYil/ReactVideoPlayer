@@ -12,6 +12,21 @@
     &__clickable-area {
         cursor: pointer;
     }
+    
+    &__thumbnail-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+
+    &.scrubbing &__thumbnail-img {
+        display: block;
+    }
 
     &__footer {
         bottom: u.em(0);

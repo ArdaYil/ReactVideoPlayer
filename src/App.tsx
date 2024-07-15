@@ -26,6 +26,7 @@ const App = () => {
   const timelineThumbRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
   const clickableAreaRef = useRef<HTMLDivElement>(null);
+  const thumbnailImageRef = useRef<HTMLImageElement>(null);
 
   const playVideo = () => {
     videoRef.current?.play();
@@ -127,8 +128,12 @@ const App = () => {
     const timelineContainer = timelineContainerRef.current;
     const timeline = timelineRef.current;
     const previewImg = previewImgRef.current;
+    const thumbnailImage = thumbnailImageRef.current;
 
-    if (!(video && timelineContainer && timeline && previewImg)) return;
+    if (
+      !(video && timelineContainer && timeline && previewImg && thumbnailImage)
+    )
+      return;
 
     const rect = timeline.getBoundingClientRect();
     const percent =
@@ -151,6 +156,9 @@ const App = () => {
 
     if (isScrubbing) {
       e.preventDefault();
+
+      thumbnailImage.src = previewImgSrc;
+
       timelineContainer.style.setProperty(
         "--progress-position",
         percent.toString()
@@ -382,6 +390,8 @@ const App = () => {
         className="video-container__video"
         src="src/assets/Main.mp4"
       />
+
+      <img ref={thumbnailImageRef} className="video-container__thumbnail-img" />
 
       <header className="video-container__header">
         <div className="video-container__header__header-controls">
