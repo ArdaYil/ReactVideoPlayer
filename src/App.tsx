@@ -185,6 +185,32 @@ const App = () => {
     handleTimelineUpdate(e);
   };
 
+  const skip = (duration: number) => {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    video.currentTime += duration;
+  };
+
+  const increaseVolume = () => {
+    const video = videoRef.current;
+
+    if (!video) return;
+    console.log(video.volume);
+    video.volume = Math.min(1, video.volume + 0.1);
+    setVolume(Math.min(1, volume + 0.1));
+  };
+
+  const decreaseVolume = () => {
+    const video = videoRef.current;
+
+    if (!video) return;
+    console.log(video.volume);
+    video.volume = Math.max(0, video.volume - 0.1);
+    setVolume(Math.max(0, volume - 0.1));
+  };
+
   const handleKeyEvent = (e: KeyboardEvent) => {
     const tagName = document.activeElement?.tagName.toLowerCase();
 
@@ -192,7 +218,6 @@ const App = () => {
       e.preventDefault();
     }
 
-    console.log(tagName);
     if (tagName === "input") return;
 
     switch (e.key.toLowerCase()) {
@@ -225,15 +250,25 @@ const App = () => {
       case "j":
         skip(-15);
         break;
+
+      case "arrowup":
+        increaseVolume();
+        break;
+
+      case "arrowdown":
+        decreaseVolume();
+        break;
     }
   };
 
-  const skip = (duration: number) => {
+  const videoLoaded = () => {
     const video = videoRef.current;
 
     if (!video) return;
 
-    video.currentTime += duration;
+    setTime();
+
+    video.volume = volume;
   };
 
   useEffect(() => {
@@ -254,7 +289,7 @@ const App = () => {
       video.volume = 0;
     }
 
-    video?.addEventListener("loadeddata", setTime);
+    video?.addEventListener("loadeddata", videoLoaded);
 
     video.addEventListener("timeupdate", () => {
       setTime();
