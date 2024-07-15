@@ -205,7 +205,31 @@ const App = () => {
       case "m":
         toggleMute();
         break;
+
+      case "arrowright":
+        skip(5);
+        break;
+
+      case "l":
+        skip(15);
+        break;
+
+      case "arrowleft":
+        skip(-5);
+        break;
+
+      case "j":
+        skip(-15);
+        break;
     }
+  };
+
+  const skip = (duration: number) => {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    video.currentTime += duration;
   };
 
   useEffect(() => {
