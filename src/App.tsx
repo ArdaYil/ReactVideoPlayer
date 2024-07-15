@@ -188,13 +188,17 @@ const App = () => {
   const handleKeyEvent = (e: KeyboardEvent) => {
     const tagName = document.activeElement?.tagName.toLowerCase();
 
-    if (tagName === "imput") return;
+    if (e.key.toLocaleLowerCase() !== "tab" && tagName !== "input") {
+      e.preventDefault();
+    }
+
+    console.log(tagName);
+    if (tagName === "input") return;
 
     switch (e.key.toLowerCase()) {
       case " ":
         if (tagName === "button") return;
       case "k":
-        console.log("k");
         togglePlayback();
         break;
 
@@ -319,7 +323,7 @@ const App = () => {
     return () => {
       video.removeEventListener("loadeddata", () => {});
       video.removeEventListener("timeupdate", () => {});
-      videoContainer.removeEventListener("mousedown", () => {});
+      videoContainer.removeEventListener("mousedown", togglePlayback);
       window.removeEventListener("keydown", handleKeyEvent);
     };
   }, [isMuted, isPlaying, volume]);
