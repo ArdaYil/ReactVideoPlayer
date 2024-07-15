@@ -25,6 +25,7 @@ const App = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const timelineThumbRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
+  const clickableAreaRef = useRef<HTMLDivElement>(null);
 
   const playVideo = () => {
     videoRef.current?.play();
@@ -279,9 +280,17 @@ const App = () => {
     const timeline = timelineRef.current;
     const previewImg = previewImgRef.current;
     const videoContainer = videoContainerRef.current;
+    const clickableArea = clickableAreaRef.current;
 
     if (
-      !(video && timelineContainer && timeline && previewImg && videoContainer)
+      !(
+        video &&
+        clickableArea &&
+        timelineContainer &&
+        timeline &&
+        previewImg &&
+        videoContainer
+      )
     )
       return;
 
@@ -302,7 +311,7 @@ const App = () => {
       );
     });
 
-    videoContainer.addEventListener("mousedown", togglePlayback);
+    clickableArea.addEventListener("mousedown", togglePlayback);
 
     window.addEventListener("keydown", handleKeyEvent);
 
@@ -358,7 +367,7 @@ const App = () => {
     return () => {
       video.removeEventListener("loadeddata", () => {});
       video.removeEventListener("timeupdate", () => {});
-      videoContainer.removeEventListener("mousedown", togglePlayback);
+      clickableArea.removeEventListener("mousedown", togglePlayback);
       window.removeEventListener("keydown", handleKeyEvent);
     };
   }, [isMuted, isPlaying, volume]);
@@ -383,6 +392,10 @@ const App = () => {
         </div>
         <p className="video-container__header__title"></p>
       </header>
+      <div
+        ref={clickableAreaRef}
+        className="video-container__clickable-area"
+      ></div>
       <footer ref={footerRef} className="video-container__footer">
         <div
           ref={timelineContainerRef}
