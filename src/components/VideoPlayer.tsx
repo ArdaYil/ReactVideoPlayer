@@ -10,15 +10,16 @@ import {
 } from "react-icons/md";
 import { IoSettingsSharp } from "react-icons/io5";
 import { TbRewindForward10, TbRewindBackward10 } from "react-icons/tb";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import Slider from "./Slider";
 
 interface Props {
   src: string;
   previewFolder: string;
+  header: ReactNode;
 }
 
-const VideoPlayer = ({ src, previewFolder }: Props) => {
+const VideoPlayer = ({ src, previewFolder, header }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
@@ -395,12 +396,7 @@ const VideoPlayer = ({ src, previewFolder }: Props) => {
       <img ref={thumbnailImageRef} className="video-container__thumbnail-img" />
 
       <header className="video-container__header">
-        <div className="video-container__header__header-controls">
-          <FaArrowLeft />
-          <BiLike />
-          <BiDislike />
-          <FaRegBookmark />
-        </div>
+        <div className="video-container__header__header-controls">{header}</div>
         <p className="video-container__header__title"></p>
       </header>
       <div
