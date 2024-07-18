@@ -17,10 +17,11 @@ import useVideoStore from "../stores/VideoStore";
 interface Props {
   src: string;
   previewFolder: string;
+  posterSrc: string;
   header: ReactNode;
 }
 
-const VideoPlayer = ({ src, previewFolder, header }: Props) => {
+const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const videoStore = useVideoStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
@@ -390,7 +391,12 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
       ref={videoContainerRef}
       className={`video-container ${!videoStore.isPlaying ? "paused" : ""}`}
     >
-      <video ref={videoRef} className="video-container__video" src={src} />
+      <video
+        poster={posterSrc}
+        ref={videoRef}
+        className="video-container__video"
+        src={src}
+      />
 
       <img ref={thumbnailImageRef} className="video-container__thumbnail-img" />
 
