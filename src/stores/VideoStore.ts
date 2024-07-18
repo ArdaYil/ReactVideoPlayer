@@ -11,22 +11,33 @@ interface VideoStore {
   increaseVolume: (increaseAmount: number) => void;
   decreaseVolume: (decreaseAmount: number) => void;
   mute: () => void;
-  umMute: () => void;
+  unMute: () => void;
 }
+
+const minVolume = 0;
+const maxVolume = 1;
+
+const increaseVolume = (increaseAmount: number, currentVolume: number) => {
+  return Math.min(maxVolume, currentVolume + increaseAmount);
+};
+
+const decreaseVolume = (decreaseAmount: number, currentVolume: number) => {
+  return Math.max(minVolume, currentVolume - decreaseAmount);
+};
 
 const useVideoStore = create<VideoStore>((set) => ({
   isPlaying: false,
-  volume: 0,
+  volume: 0.5,
   isMuted: false,
   play: () => set(() => ({ isPlaying: true })),
   pause: () => set(() => ({ isPlaying: false })),
   setVolume: (newVolume) => set(() => ({ volume: newVolume })),
   increaseVolume: (increaseAmount) =>
-    set((state) => ({ volume: state.volume + increaseAmount })),
+    set((state) => ({ volume: increaseVolume(increaseAmount, state.volume) })),
   decreaseVolume: (decreaseAmount) =>
-    set((state) => ({ volume: state.volume - decreaseAmount })),
+    set((state) => ({ volume: decreaseVolume(decreaseAmount, state.volume) })),
   mute: () => set(() => ({ isMuted: true })),
-  umMute: () => set(() => ({ isMuted: false })),
+  unMute: () => set(() => ({ isMuted: false })),
 }));
 
 export default useVideoStore;

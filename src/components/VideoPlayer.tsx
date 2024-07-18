@@ -10,8 +10,9 @@ import {
 } from "react-icons/md";
 import { IoSettingsSharp } from "react-icons/io5";
 import { TbRewindForward10, TbRewindBackward10 } from "react-icons/tb";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import Slider from "./Slider";
+import useVideoStore from "../stores/VideoStore";
 
 interface Props {
   src: string;
@@ -20,9 +21,7 @@ interface Props {
 }
 
 const VideoPlayer = ({ src, previewFolder, header }: Props) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const [isMuted, setIsMuted] = useState(false);
+  const videoStore = useVideoStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -36,12 +35,12 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
 
   const playVideo = () => {
     videoRef.current?.play();
-    setIsPlaying(true);
+    videoStore.play();
   };
 
   const pauseVideo = () => {
     videoRef.current?.pause();
-    setIsPlaying(false);
+    videoStore.pause();
   };
 
   const togglePlayback = () => {
@@ -81,8 +80,8 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
   };
 
   const handleVolumeChange = (newVolume: number) => {
-    setIsMuted(false);
-    setVolume(newVolume);
+    videoStore.unMute();
+    videoStore.setVolume(newVolume);
 
     const video = videoRef.current;
 
@@ -92,13 +91,13 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
   };
 
   const renderVolumeIcon = () => {
-    if (isMuted)
+    if (videoStore.isMuted)
       return <MdVolumeMute onClick={toggleMute} className="volume-mute" />;
 
-    if (volume > 0.5)
+    if (videoStore.volume > 0.5)
       return <MdVolumeUp onClick={toggleMute} className="volume-high" />;
 
-    if (volume > 0)
+    if (videoStore.volume > 0)
       return <MdVolumeDown onClick={toggleMute} className="volume-low" />;
 
     return <MdVolumeMute onClick={toggleMute} className="volume-mute" />;
@@ -120,11 +119,11 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
 
     if (!video) return;
 
-    if (isMuted) {
-      setIsMuted(false);
-      video.volume = volume;
+    if (videoStore.isMuted) {
+      videoStore.unMute();
+      video.volume = videoStore.volume;
     } else {
-      setIsMuted(true);
+      videoStore.mute;
       video.volume = 0;
     }
   };
@@ -214,7 +213,7 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
     if (!video) return;
     console.log(video.volume);
     video.volume = Math.min(1, video.volume + 0.1);
-    setVolume(Math.min(1, volume + 0.1));
+    videoStore.increaseVolume(0.1);
   };
 
   const decreaseVolume = () => {
@@ -223,7 +222,7 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
     if (!video) return;
     console.log(video.volume);
     video.volume = Math.max(0, video.volume - 0.1);
-    setVolume(Math.max(0, volume - 0.1));
+    videoStore.decreaseVolume(0.1);
   };
 
   const handleKeyEvent = (e: KeyboardEvent) => {
@@ -283,7 +282,7 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
 
     setTime();
 
-    video.volume = volume;
+    video.volume = videoStore.volume;
   };
 
   useEffect(() => {
@@ -308,7 +307,7 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
     )
       return;
 
-    if (isMuted) {
+    if (videoStore.isMuted) {
       video.volume = 0;
     }
 
@@ -384,12 +383,12 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
       clickableArea.removeEventListener("mousedown", togglePlayback);
       window.removeEventListener("keydown", handleKeyEvent);
     };
-  }, [isMuted, isPlaying, volume]);
+  }, [videoStore.isMuted, videoStore.isPlaying, videoStore.volume]);
 
   return (
     <div
       ref={videoContainerRef}
-      className={`video-container ${!isPlaying ? "paused" : ""}`}
+      className={`video-container ${!videoStore.isPlaying ? "paused" : ""}`}
     >
       <video ref={videoRef} className="video-container__video" src={src} />
 
@@ -432,7 +431,7 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
                 className="volume-slider"
                 min={0}
                 max={1}
-                volume={volume}
+                volume={videoStore.volume}
                 onChange={handleVolumeChange}
               />
             </div>

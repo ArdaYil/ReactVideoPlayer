@@ -179,10 +179,10 @@ svg {
 .volume-container {
     display: flex;
     align-items: center;
-    gap: u.em(10);
 }
 
 .volume-container:hover .volume-slider {
     width: u.em(100);
     transform: scaleX(1);
+    margin-left: u.em(10);
 }
