@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
 interface Props {
+  className: string;
   min: number;
   max: number;
   volume: number;
   onChange: (value: number) => void;
 }
 
-const Slider = ({ min, max, volume, onChange }: Props) => {
+const Slider = ({ className = "", min, max, volume, onChange }: Props) => {
   const sliderRef = useRef<HTMLInputElement>(null);
 
   const setSliderBackground = () => {
@@ -35,7 +36,7 @@ const Slider = ({ min, max, volume, onChange }: Props) => {
   });
 
   return (
-    <div className="slider-container">
+    <div className={`slider-container ${className}`}>
       <input
         className="slider-container__slider"
         type="range"

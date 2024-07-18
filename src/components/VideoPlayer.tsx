@@ -426,13 +426,16 @@ const VideoPlayer = ({ src, previewFolder, header }: Props) => {
           <div className="video-container__footer__video-controls__left">
             <FaPlay className="play" color="white" onClick={togglePlayback} />
             <FaPause className="pause" onClick={togglePlayback} />
-            {renderVolumeIcon()}
-            <Slider
-              min={0}
-              max={1}
-              volume={volume}
-              onChange={handleVolumeChange}
-            />
+            <div className="volume-container">
+              {renderVolumeIcon()}
+              <Slider
+                className="volume-slider"
+                min={0}
+                max={1}
+                volume={volume}
+                onChange={handleVolumeChange}
+              />
+            </div>
             <TbRewindBackward10 />
             <TbRewindForward10 className="rewind-forward" />
           </div>
