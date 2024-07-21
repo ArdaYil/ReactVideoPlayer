@@ -1,5 +1,3 @@
-import { FaArrowLeft, FaRegBookmark } from "react-icons/fa";
-import { BiLike, BiDislike } from "react-icons/bi";
 import { FaPlay, FaPause } from "react-icons/fa6";
 import {
   MdVolumeUp,
@@ -10,7 +8,7 @@ import {
 } from "react-icons/md";
 import { IoSettingsSharp } from "react-icons/io5";
 import { TbRewindForward10, TbRewindBackward10 } from "react-icons/tb";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import Slider from "./Slider";
 import useVideoStore from "../stores/VideoStore";
 
@@ -33,6 +31,8 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const previewImgRef = useRef<HTMLImageElement>(null);
   const clickableAreaRef = useRef<HTMLDivElement>(null);
   const thumbnailImageRef = useRef<HTMLImageElement>(null);
+
+  let lastMouseMovementTime = Date.now();
 
   const playVideo = () => {
     videoRef.current?.play();
@@ -226,6 +226,16 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     videoStore.decreaseVolume(0.1);
   };
 
+  const enableControlsVisibility = () => {
+    const footer = footerRef.current;
+
+    if (!footer) return;
+
+    footer.style.opacity = "1";
+
+    lastMouseMovementTime = Date.now();
+  };
+
   const handleKeyEvent = (e: KeyboardEvent) => {
     const tagName = document.activeElement?.tagName.toLowerCase();
 
@@ -240,6 +250,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
         if (tagName === "button") return;
       case "k":
         togglePlayback();
+        enableControlsVisibility();
         break;
 
       case "f":
@@ -287,8 +298,6 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   };
 
   useEffect(() => {
-    let lastMouseMovementTime = Date.now();
-
     const video = videoRef.current;
     const timelineContainer = timelineContainerRef.current;
     const timeline = timelineRef.current;
@@ -353,9 +362,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
         if (!footer) return;
 
-        footer.style.opacity = "1";
-
-        lastMouseMovementTime = Date.now();
+        enableControlsVisibility();
       }
     );
 

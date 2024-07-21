@@ -6,7 +6,6 @@ const App = () => {
       header={<></>}
       src="src/assets/Main.mp4"
       previewFolder="src/assets/previews"
-      posterSrc="src/assets/Icon.jpg"
     />
   );
 };
