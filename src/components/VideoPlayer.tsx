@@ -385,6 +385,16 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
       }
     }, 1_000);
 
+    document.getElementById("input")?.addEventListener("change", function () {
+      const media = URL.createObjectURL((this as any).files[0]);
+      const video = videoRef.current;
+
+      if (!video) return;
+
+      video.src = media;
+      video.play();
+    });
+
     return () => {
       video.removeEventListener("loadeddata", () => {});
       video.removeEventListener("timeupdate", () => {});
