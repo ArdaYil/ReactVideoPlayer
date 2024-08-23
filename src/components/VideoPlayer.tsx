@@ -188,7 +188,6 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     isScrubbing = (e.buttons & 1) === 1;
 
     videoContainer.classList.toggle("scrubbing", isScrubbing);
-
     if (isScrubbing) {
       wasPaused = video.paused;
       pauseVideo();
@@ -297,6 +296,56 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     video.volume = videoStore.volume;
   };
 
+  const handleTimelineMouseLeave = () => {
+    const timelineContainer = timelineContainerRef.current;
+    const previewImg = previewImgRef.current;
+
+    if (!(timelineContainer && previewImg)) return;
+
+    timelineContainer.style.setProperty("--preview-position", "0");
+    previewImg.style.display = "none";
+  };
+
+  const handleDocumentMouseMove = (e: MouseEvent) => {
+    if (isScrubbing) handleTimelineUpdate(e);
+  };
+
+  const handleDocumentMouseUp = (e: MouseEvent) => {
+    if (isScrubbing) toggleScrubbing(e);
+  };
+
+  const handleVideoMouseMove = (e: MouseEvent) => {
+    const footer = footerRef.current;
+
+    if (!footer) return;
+
+    enableControlsVisibility();
+  };
+
+  const handleVideoTimeUpdate = () => {
+    const video = videoRef.current;
+    const timelineContainer = timelineContainerRef.current;
+
+    if (!(video && timelineContainer)) return;
+
+    setTime();
+
+    const percent = video.currentTime / video.duration;
+
+    timelineContainer.style.setProperty(
+      "--progress-position",
+      percent.toString()
+    );
+  };
+
+  const handleVideoMouseLeave = () => {
+    const footer = footerRef.current;
+
+    if (!footer) return;
+
+    footer.style.opacity = "0";
+  };
+
   useEffect(() => {
     const video = videoRef.current;
     const timelineContainer = timelineContainerRef.current;
@@ -323,16 +372,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     video?.addEventListener("loadeddata", videoLoaded);
 
-    video.addEventListener("timeupdate", () => {
-      setTime();
-
-      const percent = video.currentTime / video.duration;
-
-      timelineContainer.style.setProperty(
-        "--progress-position",
-        percent.toString()
-      );
-    });
+    video.addEventListener("timeupdate", handleVideoTimeUpdate);
 
     clickableArea.addEventListener("mousedown", togglePlayback);
 
@@ -340,39 +380,23 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     timelineContainer.addEventListener("mousemove", handleTimelineUpdate);
 
-    timelineContainer.addEventListener("mouseleave", () => {
-      timelineContainer.style.setProperty("--preview-position", "0");
-      previewImg.style.display = "none";
-    });
+    timelineContainer.addEventListener("mouseleave", handleTimelineMouseLeave);
 
     timelineContainer.addEventListener("mousedown", toggleScrubbing);
 
-    document.addEventListener("mouseup", (e) => {
-      if (isScrubbing) toggleScrubbing(e);
-    });
+    document.addEventListener("mouseup", handleDocumentMouseUp);
 
-    document.addEventListener("mousemove", (e) => {
-      if (isScrubbing) handleTimelineUpdate(e);
-    });
+    document.addEventListener("mousemove", handleDocumentMouseMove);
 
     videoContainerRef.current?.addEventListener(
       "mousemove",
-      (e: MouseEvent) => {
-        const footer = footerRef.current;
-
-        if (!footer) return;
-
-        enableControlsVisibility();
-      }
+      handleVideoMouseMove
     );
 
-    videoContainerRef.current?.addEventListener("mouseleave", () => {
-      const footer = footerRef.current;
-
-      if (!footer) return;
-
-      footer.style.opacity = "0";
-    });
+    videoContainerRef.current?.addEventListener(
+      "mouseleave",
+      handleVideoMouseLeave
+    );
 
     window.setInterval(() => {
       if (Date.now() - lastMouseMovementTime > 3_000) {
@@ -386,10 +410,26 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     }, 1_000);
 
     return () => {
+      video?.removeEventListener("loadeddata", videoLoaded);
       video.removeEventListener("loadeddata", () => {});
       video.removeEventListener("timeupdate", () => {});
       clickableArea.removeEventListener("mousedown", togglePlayback);
       window.removeEventListener("keydown", handleKeyEvent);
+      video.removeEventListener("timeupdate", handleVideoTimeUpdate);
+      timelineContainer.removeEventListener(
+        "mouseleave",
+        handleTimelineMouseLeave
+      );
+      document.removeEventListener("mouseup", handleDocumentMouseUp);
+      document.removeEventListener("mousemove", handleDocumentMouseMove);
+      videoContainerRef.current?.removeEventListener(
+        "mousemove",
+        handleVideoMouseMove
+      );
+      videoContainerRef.current?.removeEventListener(
+        "mouseleave",
+        handleVideoMouseLeave
+      );
     };
   }, [videoStore.isMuted, videoStore.isPlaying, videoStore.volume]);
 
