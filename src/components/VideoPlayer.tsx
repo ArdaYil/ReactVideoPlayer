@@ -188,8 +188,9 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
       Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
 
     isScrubbing = (e.buttons & 1) === 1;
-
+    console.log(isScrubbing);
     videoContainer.classList.toggle("scrubbing", isScrubbing);
+
     if (isScrubbing) {
       wasPaused = video.paused;
       pauseVideo();
@@ -240,7 +241,11 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const handleKeyEvent = (e: KeyboardEvent) => {
     const tagName = document.activeElement?.tagName.toLowerCase();
 
-    if (e.key.toLocaleLowerCase() !== "tab" && tagName !== "input") {
+    if (
+      e.key.toLocaleLowerCase() !== "tab" &&
+      tagName !== "input" &&
+      e.key.toLowerCase() != "f12"
+    ) {
       e.preventDefault();
     }
 
@@ -400,7 +405,6 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     window.setInterval(() => {
       const { x, y, width, height } = timelineContainer.getBoundingClientRect();
 
-      console.log(mouseX, mouseY, x, y, x + width, y + width);
       if (mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height)
         return;
 
@@ -415,7 +419,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     }, 1_000);
 
     return () => {
-      video?.removeEventListener("loadeddata", videoLoaded);
+      video.removeEventListener("loadeddata", videoLoaded);
       video.removeEventListener("loadeddata", () => {});
       video.removeEventListener("timeupdate", () => {});
       clickableArea.removeEventListener("mousedown", togglePlayback);
@@ -425,8 +429,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
         "mouseleave",
         handleTimelineMouseLeave
       );
-      document.removeEventListener("mouseup", handleDocumentMouseUp);
-      document.removeEventListener("mousemove", handleDocumentMouseMove);
+
       videoContainer.removeEventListener("mousemove", handleVideoMouseMove);
       videoContainer.removeEventListener("mouseleave", handleVideoMouseLeave);
     };
