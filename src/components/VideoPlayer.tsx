@@ -33,6 +33,8 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const thumbnailImageRef = useRef<HTMLImageElement>(null);
 
   let lastMouseMovementTime = Date.now();
+  let mouseX = 0;
+  let mouseY = 0;
 
   const playVideo = () => {
     videoRef.current?.play();
@@ -307,6 +309,9 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   };
 
   const handleDocumentMouseMove = (e: MouseEvent) => {
+    mouseX = e.x;
+    mouseY = e.y;
+
     if (isScrubbing) handleTimelineUpdate(e);
   };
 
@@ -393,6 +398,12 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     videoContainer.addEventListener("mouseleave", handleVideoMouseLeave);
 
     window.setInterval(() => {
+      const { x, y, width, height } = timelineContainer.getBoundingClientRect();
+
+      console.log(mouseX, mouseY, x, y, x + width, y + width);
+      if (mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height)
+        return;
+
       if (Date.now() - lastMouseMovementTime > 3_000) {
         const footer = footerRef.current;
 
