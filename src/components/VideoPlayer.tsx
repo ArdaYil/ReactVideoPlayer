@@ -211,7 +211,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     const video = videoRef.current;
 
     if (!video) return;
-    console.log(video.volume);
+
     video.volume = Math.min(1, video.volume + 0.1);
     videoStore.increaseVolume(0.1);
   };
@@ -220,7 +220,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     const video = videoRef.current;
 
     if (!video) return;
-    console.log(video.volume);
+
     video.volume = Math.max(0, video.volume - 0.1);
     videoStore.decreaseVolume(0.1);
   };
@@ -314,7 +314,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     if (isScrubbing) toggleScrubbing(e);
   };
 
-  const handleVideoMouseMove = (e: MouseEvent) => {
+  const handleVideoMouseMove = () => {
     const footer = footerRef.current;
 
     if (!footer) return;
@@ -388,15 +388,9 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     document.addEventListener("mousemove", handleDocumentMouseMove);
 
-    videoContainerRef.current?.addEventListener(
-      "mousemove",
-      handleVideoMouseMove
-    );
+    videoContainer.addEventListener("mousemove", handleVideoMouseMove);
 
-    videoContainerRef.current?.addEventListener(
-      "mouseleave",
-      handleVideoMouseLeave
-    );
+    videoContainer.addEventListener("mouseleave", handleVideoMouseLeave);
 
     window.setInterval(() => {
       if (Date.now() - lastMouseMovementTime > 3_000) {
@@ -422,14 +416,8 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
       );
       document.removeEventListener("mouseup", handleDocumentMouseUp);
       document.removeEventListener("mousemove", handleDocumentMouseMove);
-      videoContainerRef.current?.removeEventListener(
-        "mousemove",
-        handleVideoMouseMove
-      );
-      videoContainerRef.current?.removeEventListener(
-        "mouseleave",
-        handleVideoMouseLeave
-      );
+      videoContainer.removeEventListener("mousemove", handleVideoMouseMove);
+      videoContainer.removeEventListener("mouseleave", handleVideoMouseLeave);
     };
   }, [videoStore.isMuted, videoStore.isPlaying, videoStore.volume]);
 
