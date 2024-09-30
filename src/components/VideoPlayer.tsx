@@ -20,6 +20,9 @@ interface Props {
 }
 
 const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
+  const [lastMouseMovementTime, setLastMouseMovementTime] = useState(
+    Date.now()
+  );
   const videoStore = useVideoStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
@@ -34,7 +37,6 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const rightSkipRef = useRef<HTMLDivElement>(null);
   const leftSkipRef = useRef<HTMLDivElement>(null);
 
-  let lastMouseMovementTime = Date.now();
   let lastSkippTime = Date.now();
   let mouseX = 0;
   let mouseY = 0;
@@ -235,6 +237,8 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     lastSkippTime = Date.now();
 
+    enableControlsVisibility();
+
     setTimeout(() => {
       if (Date.now() - lastSkippTime >= 1_000)
         currentElement.classList.remove("skipping");
@@ -266,7 +270,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     footer.style.opacity = "1";
 
-    lastMouseMovementTime = Date.now();
+    setLastMouseMovementTime(Date.now());
   };
 
   const handleKeyEvent = (e: KeyboardEvent) => {
@@ -385,7 +389,29 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     if (!footer) return;
 
+    console.log("Mouse leave");
     footer.style.opacity = "0";
+  };
+
+  const videoControlsVisibilityHandler = () => {
+    const timelineContainer = timelineContainerRef.current;
+
+    if (!timelineContainer) return;
+
+    const { x, y, width, height } = timelineContainer.getBoundingClientRect();
+
+    if (mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height)
+      return;
+
+    if (Date.now() - lastMouseMovementTime > 3_000) {
+      const footer = footerRef.current;
+
+      if (!footer) return;
+
+      console.log("Timeout: " + (Date.now() - lastMouseMovementTime));
+      footer.style.opacity = "0";
+      timelineContainer.style.setProperty("--preview-position", "0");
+    }
   };
 
   useEffect(() => {
@@ -434,21 +460,10 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     videoContainer.addEventListener("mouseleave", handleVideoMouseLeave);
 
-    window.setInterval(() => {
-      const { x, y, width, height } = timelineContainer.getBoundingClientRect();
-
-      if (mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height)
-        return;
-
-      if (Date.now() - lastMouseMovementTime > 3_000) {
-        const footer = footerRef.current;
-
-        if (!footer) return;
-
-        footer.style.opacity = "0";
-        timelineContainer.style.setProperty("--preview-position", "0");
-      }
-    }, 1_000);
+    const intervalId = window.setInterval(
+      videoControlsVisibilityHandler,
+      1_000
+    );
 
     return () => {
       video.removeEventListener("loadeddata", videoLoaded);
@@ -463,8 +478,16 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
       );
 
       videoContainer.removeEventListener("mouseleave", handleVideoMouseLeave);
+      window.clearInterval(intervalId);
+
+      document.removeEventListener("mousemove", handleDocumentMouseMove);
     };
-  }, [videoStore.isMuted, videoStore.isPlaying, videoStore.volume]);
+  }, [
+    videoStore.isMuted,
+    videoStore.isPlaying,
+    videoStore.volume,
+    lastMouseMovementTime,
+  ]);
 
   return (
     <div
