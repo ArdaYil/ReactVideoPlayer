@@ -186,3 +186,82 @@ svg {
     transform: scaleX(1);
     margin-left: u.em(10);
 }
+
+.skip {
+    $size: 110;
+    $distance: 100;
+
+    position: absolute;
+    background-color: rgba(39, 39, 39, 0.678);
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    height: u.em($size);
+    width: u.em($size);
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: opacity 150ms ease-in-out;
+    
+    & p {
+        text-wrap: nowrap;
+        width: 100%;
+        text-align: center;
+        font-weight: 900;
+        margin-top: u.em(20);
+        font-size: u.rem(10);
+        color: white;
+        letter-spacing: 2px;
+    }
+
+    &.left {
+        left: u.em($distance);
+
+        &.skipping {
+            opacity: 1;
+        }
+    } 
+
+    &.right {
+        right: u.em($distance);
+
+        &.skipping {
+            opacity: 1;
+        }
+    }
+}
+
+.arrow {
+    $size: 7;
+
+    width: 0; 
+    height: 0; 
+    border-top: u.em($size) solid transparent;
+    border-bottom: u.em($size) solid transparent;
+    animation: colorFade 1.5s infinite;
+    border-left: u.em($size + 5) solid white;
+
+    &.left {
+        rotate: 180deg;
+    }
+}
+
+.arrows {
+    margin-top: u.em(20);
+    display: flex;
+    gap: u.em(5)
+}
+
+@keyframes colorFade {
+    0% {
+        border-left-color: white; /* Start color */
+    }
+    50% {
+        border-left-color: #383838; /* Midpoint color */
+    }
+    100% {
+        border-left-color: white; /* End color */
+    }
+}

@@ -31,8 +31,11 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const previewImgRef = useRef<HTMLImageElement>(null);
   const clickableAreaRef = useRef<HTMLDivElement>(null);
   const thumbnailImageRef = useRef<HTMLImageElement>(null);
+  const rightSkipRef = useRef<HTMLDivElement>(null);
+  const leftSkipRef = useRef<HTMLDivElement>(null);
 
   let lastMouseMovementTime = Date.now();
+  let lastSkippTime = Date.now();
   let mouseX = 0;
   let mouseY = 0;
 
@@ -188,7 +191,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
       Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
 
     isScrubbing = (e.buttons & 1) === 1;
-    console.log(isScrubbing);
+
     videoContainer.classList.toggle("scrubbing", isScrubbing);
 
     if (isScrubbing) {
@@ -204,10 +207,38 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
   const skip = (duration: number) => {
     const video = videoRef.current;
+    let currentElement = null;
 
     if (!video) return;
 
     video.currentTime += duration;
+
+    const rightSkip = rightSkipRef.current;
+    const leftSkip = leftSkipRef.current;
+
+    if (!(rightSkip && leftSkip)) return;
+
+    if (duration > 0) {
+      rightSkip.classList.add("skipping");
+      leftSkip.classList.remove("skipping");
+      currentElement = rightSkip;
+    } else {
+      leftSkip.classList.add("skipping");
+      rightSkip.classList.remove("skipping");
+      currentElement = leftSkip;
+    }
+
+    const paragraph = currentElement.querySelector("p");
+
+    if (paragraph)
+      paragraph.textContent = `${Math.abs(duration).toString()} Seconds`;
+
+    lastSkippTime = Date.now();
+
+    setTimeout(() => {
+      if (Date.now() - lastSkippTime >= 1_000)
+        currentElement.classList.remove("skipping");
+    }, 1_000);
   };
 
   const increaseVolume = () => {
@@ -269,6 +300,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
       case "arrowright":
         skip(5);
+
         break;
 
       case "l":
@@ -430,7 +462,6 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
         handleTimelineMouseLeave
       );
 
-      videoContainer.removeEventListener("mousemove", handleVideoMouseMove);
       videoContainer.removeEventListener("mouseleave", handleVideoMouseLeave);
     };
   }, [videoStore.isMuted, videoStore.isPlaying, videoStore.volume]);
@@ -446,6 +477,23 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
         className="video-container__video"
         src={src}
       />
+
+      <div ref={leftSkipRef} className="skip left">
+        <div className="arrows">
+          <div className="arrow left"></div>
+          <div className="arrow left"></div>
+          <div className="arrow left"></div>
+        </div>
+        <p>5 Seconds</p>
+      </div>
+      <div ref={rightSkipRef} className="skip right">
+        <div className="arrows">
+          <div className="arrow a"></div>
+          <div className="arrow"></div>
+          <div className="arrow"></div>
+        </div>
+        <p>5 Seconds</p>
+      </div>
 
       <img ref={thumbnailImageRef} className="video-container__thumbnail-img" />
 
