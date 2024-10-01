@@ -191,6 +191,12 @@ svg {
     margin-left: u.em(10);
 }
 
+.volume-container.active .volume-slider {
+    width: u.em(100);
+    transform: scaleX(1);
+    margin-left: u.em(10);
+}
+
 .skip {
     $size: 110;
     $distance: 100;

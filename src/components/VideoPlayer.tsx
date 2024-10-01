@@ -37,6 +37,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const thumbnailImageRef = useRef<HTMLImageElement>(null);
   const rightSkipRef = useRef<HTMLDivElement>(null);
   const leftSkipRef = useRef<HTMLDivElement>(null);
+  const volumeContainerRef = useRef<HTMLDivElement>(null);
 
   let mouseX = 0;
   let mouseY = 0;
@@ -242,11 +243,14 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
   const increaseVolume = () => {
     const video = videoRef.current;
+    const volumeContainer = volumeContainerRef.current;
 
-    if (!video) return;
+    if (!(video && volumeContainer)) return;
 
     video.volume = Math.min(1, video.volume + 0.1);
     videoStore.increaseVolume(0.1);
+
+    volumeContainer.classList.add("active");
   };
 
   const decreaseVolume = () => {
@@ -384,11 +388,13 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const handleVideoMouseLeave = () => {
     const footer = footerRef.current;
     const videoContainer = videoContainerRef.current;
+    const volumeContainer = volumeContainerRef.current;
 
-    if (!(footer && videoContainer)) return;
+    if (!(footer && videoContainer && volumeContainer)) return;
 
     footer.style.opacity = "0";
     videoContainer.classList.add("controls-hidden");
+    volumeContainer.classList.remove("active");
   };
 
   const videoControlsVisibilityHandler = () => {
@@ -404,12 +410,14 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     if (Date.now() - lastMouseMovementTime > 3_000) {
       const footer = footerRef.current;
+      const volumeContainer = volumeContainerRef.current;
 
-      if (!footer) return;
+      if (!(footer && volumeContainer)) return;
 
       videoContainer.classList.add("controls-hidden");
       footer.style.opacity = "0";
       timelineContainer.style.setProperty("--preview-position", "0");
+      volumeContainer.classList.remove("active");
     }
   };
 
@@ -560,7 +568,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
           <div className="video-container__footer__video-controls__left">
             <FaPlay className="play" color="white" onClick={togglePlayback} />
             <FaPause className="pause" onClick={togglePlayback} />
-            <div className="volume-container">
+            <div ref={volumeContainerRef} className="volume-container">
               {renderVolumeIcon()}
               <Slider
                 className="volume-slider"
