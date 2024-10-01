@@ -265,10 +265,12 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
   const enableControlsVisibility = () => {
     const footer = footerRef.current;
+    const videoContainer = videoContainerRef.current;
 
-    if (!footer) return;
+    if (!(footer && videoContainer)) return;
 
     footer.style.opacity = "1";
+    videoContainer.classList.remove("controls-hidden");
 
     setLastMouseMovementTime(Date.now());
   };
@@ -386,17 +388,19 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
   const handleVideoMouseLeave = () => {
     const footer = footerRef.current;
+    const videoContainer = videoContainerRef.current;
 
-    if (!footer) return;
+    if (!(footer && videoContainer)) return;
 
-    console.log("Mouse leave");
     footer.style.opacity = "0";
+    videoContainer.classList.add("controls-hidden");
   };
 
   const videoControlsVisibilityHandler = () => {
     const timelineContainer = timelineContainerRef.current;
+    const videoContainer = videoContainerRef.current;
 
-    if (!timelineContainer) return;
+    if (!(timelineContainer && videoContainer)) return;
 
     const { x, y, width, height } = timelineContainer.getBoundingClientRect();
 
@@ -408,7 +412,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
       if (!footer) return;
 
-      console.log("Timeout: " + (Date.now() - lastMouseMovementTime));
+      videoContainer.classList.add("controls-hidden");
       footer.style.opacity = "0";
       timelineContainer.style.setProperty("--preview-position", "0");
     }

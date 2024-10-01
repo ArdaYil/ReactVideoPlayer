@@ -9,7 +9,7 @@
     grid-template-rows: u.em(40) auto u.em(100);
     aspect-ratio: 16 / 9;
 
-    &__clickable-area {
+    &:not(.controls-hidden) &__clickable-area {
         cursor: pointer;
     }
     
@@ -157,6 +157,10 @@
 
     &:not(.full-screen) .exit-full-screen {
         display: none;
+    }
+
+    &.controls-hidden {
+        cursor: none
     }
 }
 
