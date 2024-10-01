@@ -23,6 +23,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const [lastMouseMovementTime, setLastMouseMovementTime] = useState(
     Date.now()
   );
+  const [lastSkipTime, setLastSkipTime] = useState(Date.now());
   const videoStore = useVideoStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<HTMLParagraphElement>(null);
@@ -37,7 +38,6 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
   const rightSkipRef = useRef<HTMLDivElement>(null);
   const leftSkipRef = useRef<HTMLDivElement>(null);
 
-  let lastSkippTime = Date.now();
   let mouseX = 0;
   let mouseY = 0;
 
@@ -235,14 +235,9 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     if (paragraph)
       paragraph.textContent = `${Math.abs(duration).toString()} Seconds`;
 
-    lastSkippTime = Date.now();
+    setLastSkipTime(Date.now());
 
     enableControlsVisibility();
-
-    setTimeout(() => {
-      if (Date.now() - lastSkippTime >= 1_000)
-        currentElement.classList.remove("skipping");
-    }, 1_000);
   };
 
   const increaseVolume = () => {
@@ -418,6 +413,15 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     }
   };
 
+  const skipVisibilityHandler = () => {
+    const currentElement = document.querySelector(".skipping");
+
+    if (!currentElement) return;
+
+    if (Date.now() - lastSkipTime >= 1_500)
+      currentElement.classList.remove("skipping");
+  };
+
   useEffect(() => {
     const video = videoRef.current;
     const timelineContainer = timelineContainerRef.current;
@@ -464,10 +468,10 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
 
     videoContainer.addEventListener("mouseleave", handleVideoMouseLeave);
 
-    const intervalId = window.setInterval(
-      videoControlsVisibilityHandler,
-      1_000
-    );
+    const intervalId = window.setInterval(() => {
+      videoControlsVisibilityHandler();
+      skipVisibilityHandler();
+    }, 1_000);
 
     return () => {
       video.removeEventListener("loadeddata", videoLoaded);
@@ -491,6 +495,7 @@ const VideoPlayer = ({ src, previewFolder, header, posterSrc }: Props) => {
     videoStore.isPlaying,
     videoStore.volume,
     lastMouseMovementTime,
+    lastSkipTime,
   ]);
 
   return (
